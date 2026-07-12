@@ -1,0 +1,178 @@
+<header class="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-xl">
+  <div class="container flex h-18 items-center justify-between">
+    <!-- Logo -->
+
+    <a routerLink="/home" class="flex items-center gap-3 shrink-0">
+      <svg width="38" height="38" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#A00E13" />
+
+        <circle
+          cx="18"
+          cy="18"
+          r="15"
+          fill="none"
+          stroke="#141414"
+          stroke-width="1.5"
+          stroke-dasharray="2 3"
+        />
+
+        <circle cx="18" cy="18" r="13" fill="none" stroke="#141414" stroke-width="1" />
+
+        <text x="18" y="25" text-anchor="middle" font-size="20" font-weight="800" fill="white">
+          M
+        </text>
+      </svg>
+
+      <span class="hidden sm:block text-2xl font-extrabold text-primary"> MovieVerse </span>
+    </a>
+
+    <!-- Desktop Navigation -->
+
+    <nav class="hidden lg:flex items-center gap-8">
+      <a
+        routerLink="/home"
+        routerLinkActive="router-link-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link"
+      >
+        Home
+      </a>
+
+      <a routerLink="/movies" routerLinkActive="router-link-active" class="nav-link"> Movies </a>
+
+      <a routerLink="/tv" routerLinkActive="router-link-active" class="nav-link"> TV Shows </a>
+
+      <a routerLink="/genres" routerLinkActive="router-link-active" class="nav-link"> Genres </a>
+
+      <!-- ✅ Watchlist Link -->
+      <a routerLink="/watchlist" routerLinkActive="router-link-active" class="nav-link relative">
+        <i class="fa-regular fa-heart"></i>
+        Watchlist
+        @if (watchlistCount() > 0) {
+          <span class="absolute -top-1 -right-4 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white">
+            {{ watchlistCount() }}
+          </span>
+        }
+      </a>
+    </nav>
+
+    <!-- Right -->
+
+    <div class="flex items-center gap-3">
+      <!-- Search -->
+
+      <form (ngSubmit)="onSearch()" class="hidden md:flex items-center">
+        <div class="flex overflow-hidden rounded-xl border border-border bg-surface">
+          <input
+            [(ngModel)]="searchQuery"
+            name="search"
+            placeholder="Search movies..."
+            class="w-52 bg-transparent px-4 py-2.5 outline-none placeholder:text-text-muted"
+          />
+
+          <button
+            type="submit"
+            class="flex h-11 w-11 items-center justify-center bg-primary transition hover:bg-primary-hover"
+          >
+            <i class="fa-solid fa-search"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Mobile -->
+
+      <button
+        (click)="toggleMobileMenu()"
+        class="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-lg transition hover:border-primary md:hidden"
+      >
+        <i
+          class="fa-solid"
+          [class.fa-bars]="!isMobileMenuOpen()"
+          [class.fa-xmark]="isMobileMenuOpen()"
+        >
+        </i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+
+  @if (isMobileMenuOpen()) {
+    <div class="border-t border-border bg-background md:hidden">
+      <div class="container py-6">
+        <nav class="mb-6 flex flex-col gap-1">
+          <a
+            routerLink="/home"
+            routerLinkActive="router-link-active"
+            (click)="closeMobileMenu()"
+            class="flex items-center gap-3 rounded-xl px-4 py-3 transition hover:bg-background"
+          >
+            <i class="fa-solid fa-house w-5"></i>
+            Home
+          </a>
+
+          <a
+            routerLink="/movies"
+            routerLinkActive="router-link-active"
+            (click)="closeMobileMenu()"
+            class="flex items-center gap-3 rounded-xl px-4 py-3 transition hover:bg-background"
+          >
+            <i class="fa-solid fa-film w-5"></i>
+            Movies
+          </a>
+
+          <a
+            routerLink="/tv"
+            routerLinkActive="router-link-active"
+            (click)="closeMobileMenu()"
+            class="flex items-center gap-3 rounded-xl px-4 py-3 transition hover:bg-background"
+          >
+            <i class="fa-solid fa-tv w-5"></i>
+            TV Shows
+          </a>
+
+          <a
+            routerLink="/genres"
+            routerLinkActive="router-link-active"
+            (click)="closeMobileMenu()"
+            class="flex items-center gap-3 rounded-xl px-4 py-3 transition hover:bg-background"
+          >
+            <i class="fa-solid fa-tag w-5"></i>
+            Genres
+          </a>
+
+          <!-- ✅ Mobile Watchlist Link -->
+          <a
+            routerLink="/watchlist"
+            routerLinkActive="router-link-active"
+            (click)="closeMobileMenu()"
+            class="flex items-center gap-3 rounded-xl px-4 py-3 transition hover:bg-background"
+          >
+            <i class="fa-regular fa-heart w-5"></i>
+            Watchlist
+          </a>
+        </nav>
+
+        <!-- Mobile Search -->
+
+        <form (ngSubmit)="onSearch()">
+          <div class="flex overflow-hidden rounded-xl border border-border">
+            <input
+              [(ngModel)]="searchQuery"
+              name="search"
+              placeholder="Search..."
+              class="flex-1 bg-background px-4 py-3 outline-none placeholder:text-text-muted"
+            />
+
+            <button
+              (click)="closeMobileMenu()"
+              class="flex w-14 items-center justify-center bg-primary"
+            >
+              <i class="fa-solid fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</header>

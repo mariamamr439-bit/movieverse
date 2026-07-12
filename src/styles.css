@@ -1,1 +1,240 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+/* ============================
+   Fonts
+============================ */
+
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/inter/800.css";
+
+/* ============================
+   Theme
+============================ */
+
+@theme {
+
+  /* Brand */
+
+  --color-primary:#A00E13;
+  --color-primary-hover:#8E0C11;
+  --color-secondary:#99240F;
+
+  /* Background */
+
+  --color-background:#141414;
+  --color-surface:#1A1A2E;
+  --color-surface-light:#2D2D44;
+
+  /* Text */
+
+  --color-text:#FFFFFF;
+  --color-text-secondary:#B0B0B0;
+  --color-text-muted:#6B6B6B;
+
+  /* Accent */
+
+  --color-accent:#FFD700;
+  --color-accent-hover:#E6C200;
+
+  /* Border */
+
+  --color-border:rgba(255,255,255,.06);
+  --color-border-light:rgba(255,255,255,.12);
+
+  /* Radius */
+
+  --radius-xl:1.5rem;
+
+  /* Shadow */
+
+  --shadow-card:0 8px 32px rgba(0,0,0,.4);
+  --shadow-hover:0 12px 48px rgba(0,0,0,.55);
+  --shadow-dropdown:0 18px 48px rgba(0,0,0,.45);
+
+}
+/* ============================
+   Base
+============================ */
+
+*,
+*::before,
+*::after{
+
+  box-sizing:border-box;
+
+}
+
+html{
+
+  scroll-behavior:smooth;
+
+  font-family:"Inter",sans-serif;
+
+}
+
+body{
+
+  min-height:100vh;
+
+  background:var(--color-background);
+
+  color:var(--color-text);
+
+  -webkit-font-smoothing:antialiased;
+
+  -moz-osx-font-smoothing:grayscale;
+
+}
+
+img,
+svg{
+
+  display:block;
+
+  max-width:100%;
+
+}
+
+a{
+
+  text-decoration:none;
+
+  color:inherit;
+
+}
+
+button,
+input,
+textarea,
+select{
+
+  font:inherit;
+
+}
+/* ============================
+   Scrollbar
+============================ */
+
+::-webkit-scrollbar{
+
+  width:7px;
+
+}
+
+::-webkit-scrollbar-track{
+
+  background:var(--color-background);
+
+}
+
+::-webkit-scrollbar-thumb{
+
+  background:var(--color-primary);
+
+  border-radius:999px;
+
+}
+
+::selection{
+
+  background:var(--color-primary);
+
+  color:white;
+
+}
+/* ============================
+   Utilities
+============================ */
+
+@utility nav-link{
+
+  @apply relative text-sm font-medium text-text-secondary transition-colors duration-300 hover:text-white;
+
+}
+
+@utility primary-btn{
+
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 font-semibold text-white transition-all duration-300 hover:bg-primary-hover hover:-translate-y-0.5;
+
+}
+
+@utility secondary-btn{
+
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-2.5 font-semibold text-white transition-all duration-300 hover:border-primary;
+
+}
+
+@utility input-field{
+
+  @apply rounded-xl border border-border bg-surface px-4 py-2 text-white outline-none transition-all duration-300 focus:border-primary placeholder:text-text-muted;
+
+}
+
+@utility card{
+
+  @apply rounded-3xl border border-border bg-surface shadow-card;
+
+}
+
+@utility glass{
+
+  @apply border border-white/10 bg-white/5 backdrop-blur-xl;
+
+}
+
+@utility section-title{
+
+  @apply text-3xl font-bold text-white;
+
+}
+.app-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.4);
+  z-index: 9999;
+}
+
+.ball-fussion {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+/* balls */
+.ball-fussion div {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #fff;
+  top: 50%;
+  left: 50%;
+  margin: -8px 0 0 -8px;
+
+  animation: ball-fussion 1.2s infinite cubic-bezier(.5, 0, .5, 1);
+}
+
+/* delays (important for ngx feel) */
+.ball-fussion div:nth-child(1) { animation-delay: -0.3s; }
+.ball-fussion div:nth-child(2) { animation-delay: -0.2s; }
+.ball-fussion div:nth-child(3) { animation-delay: -0.1s; }
+.ball-fussion div:nth-child(4) { animation-delay: 0s; }
+@keyframes ball-fussion {
+  0% {
+    transform: rotate(0deg) translate(30px) rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) translate(30px) rotate(-180deg) scale(0.5);
+  }
+
+  100% {
+    transform: rotate(360deg) translate(30px) rotate(-360deg) scale(1);
+  }
+}

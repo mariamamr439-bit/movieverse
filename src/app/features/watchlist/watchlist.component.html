@@ -1,0 +1,107 @@
+<div class="min-h-screen bg-background py-8">
+  <div class="container mx-auto px-4">
+
+    <!-- Header -->
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-extrabold text-white">My Watchlist</h1>
+        <p class="text-text-secondary mt-1">{{ watchlistCount() }} items saved</p>
+      </div>
+      @if (watchlistCount() > 0) {
+        <button
+          (click)="clearWatchlist()"
+          class="px-4 py-2 text-sm text-red-400 hover:text-red-500 border border-red-500/30 hover:border-red-500 rounded-xl transition"
+        >
+          <i class="fa-solid fa-trash mr-2"></i>
+          Clear All
+        </button>
+      }
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="flex flex-wrap gap-3 mb-6 border-b border-border pb-4">
+      <button
+        (click)="setFilter('all')"
+        [class]="filterType() === 'all' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+        class="pb-2 font-semibold transition"
+      >
+        All ({{ watchlistCount() }})
+      </button>
+      <button
+        (click)="setFilter('movie')"
+        [class]="filterType() === 'movie' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+        class="pb-2 font-semibold transition"
+      >
+        Movies ({{ movieCount() }})
+      </button>
+      <button
+        (click)="setFilter('tv')"
+        [class]="filterType() === 'tv' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+        class="pb-2 font-semibold transition"
+      >
+        TV Shows ({{ tvCount() }})
+      </button>
+    </div>
+
+    <!-- Watchlist Grid -->
+    @if (filteredWatchlist().length > 0) {
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+        @for (item of filteredWatchlist(); track item.id) {
+          <div class="group relative bg-surface rounded-xl border border-border overflow-hidden transition hover:-translate-y-1 hover:border-primary">
+            
+            <!-- Link to details -->
+            <a [routerLink]="getLink(item)" class="block">
+              <div class="relative aspect-2/3 bg-surface">
+                <img
+                  [src]="getPosterUrl(item.poster_path)"
+                  [alt]="getTitle(item)"
+                  class="w-full h-full object-cover transition group-hover:scale-105"
+                  loading="lazy"
+                />
+                <!-- Media Type Badge -->
+                <div class="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-white">
+                  <i [class]="item.media_type === 'movie' ? 'fa-solid fa-film' : 'fa-solid fa-tv'"></i>
+                  {{ item.media_type === 'movie' ? 'Movie' : 'TV Show' }}
+                </div>
+                @if (item.vote_average) {
+                  <div class="absolute top-2 right-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-yellow-400 flex items-center gap-1">
+                    <i class="fa-solid fa-star"></i>
+                    {{ item.vote_average.toFixed(1) }}
+                  </div>
+                }
+              </div>
+              <div class="p-3">
+                <p class="text-sm font-medium text-white line-clamp-1">{{ getTitle(item) }}</p>
+                <p class="text-xs text-text-secondary">{{ getYear(item) }}</p>
+              </div>
+            </a>
+
+            <!-- Remove Button -->
+            <button
+              (click)="removeFromWatchlist(item)"
+              class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-black/70 hover:bg-red-500 rounded-full w-8 h-8 flex items-center justify-center text-white"
+              title="Remove from watchlist"
+            >
+              <i class="fa-solid fa-times"></i>
+            </button>
+
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="flex flex-col items-center justify-center py-20">
+        <i class="fa-regular fa-heart text-6xl text-text-muted mb-4"></i>
+        <h2 class="text-2xl font-bold text-white">Your watchlist is empty</h2>
+        <p class="text-text-secondary mt-2">Start adding movies and TV shows you want to watch</p>
+        <a
+          routerLink="/movies"
+          class="mt-6 px-6 py-3 bg-primary hover:bg-primary-hover rounded-xl text-white font-semibold transition"
+        >
+          Browse Movies
+        </a>
+      </div>
+    }
+
+  </div>
+</div>

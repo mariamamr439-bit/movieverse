@@ -1,0 +1,135 @@
+<div class="min-h-screen bg-background py-8">
+  <div class="container mx-auto px-4">
+
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-4xl font-extrabold text-white">Movies</h1>
+          <p class="text-text-secondary mt-1">Discover and explore the best movies</p>
+        </div>
+        @if (selectedGenreId() !== null) {
+          <button
+            (click)="clearGenreFilter()"
+            class="flex items-center gap-2 px-4 py-2 bg-primary/20 text-primary hover:bg-primary hover:text-white rounded-xl transition"
+          >
+            <i class="fa-solid fa-times"></i>
+            Clear Filter: {{ getGenreName(selectedGenreId()!) }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex flex-wrap gap-2 mb-8 border-b border-border pb-4">
+      @for (tab of tabs; track tab.id) {
+        <button
+          (click)="setTab(tab.id)"
+          [class]="activeTab() === tab.id 
+            ? 'bg-primary text-white border-primary' 
+            : 'bg-surface-light text-text-secondary border-border hover:border-primary hover:text-white'"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-xl border transition-all duration-300"
+        >
+          <i [class]="tab.icon"></i>
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    <!-- Genre Filter Info -->
+    @if (selectedGenreId() !== null) {
+      <div class="mb-6 p-4 bg-surface rounded-xl border border-primary/30">
+        <p class="text-text-secondary">
+          Showing <span class="text-white font-semibold">{{ totalItems() }}</span> movies in 
+          <span class="text-primary font-semibold">{{ getGenreName(selectedGenreId()!) }}</span>
+        </p>
+      </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="flex items-center justify-center py-20">
+        <div class="flex flex-col items-center gap-3">
+          <i class="fa-solid fa-spinner fa-spin text-3xl text-primary"></i>
+          <p class="text-text-secondary">Loading movies...</p>
+        </div>
+      </div>
+    }
+
+    <!-- Movie Grid -->
+    @if (!isLoading()) {
+      <div class="movie-grid mb-8">
+        @for (movie of currentMovies(); track movie.id) {
+          <app-movie-card [movie]="movie" [type]="'movie'" />
+        } @empty {
+          <div class="col-span-full flex items-center justify-center py-20">
+            <div class="text-center">
+              <i class="fa-solid fa-film text-5xl text-text-muted mb-4 block"></i>
+              <p class="text-text-secondary">No movies found</p>
+              @if (selectedGenreId() !== null) {
+                <button 
+                  (click)="clearGenreFilter()" 
+                  class="mt-4 text-primary hover:underline transition"
+                >
+                  Clear genre filter
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Pagination -->
+    @if (!isLoading() && totalItems() > 0) {
+      <div class="flex flex-wrap items-center justify-between gap-4 mt-8 pt-6 border-t border-border">
+
+        <!-- Info -->
+        <div class="text-sm text-text-secondary">
+          Showing {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalItems() }} movies
+        </div>
+
+        <!-- Page Numbers -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+
+          <!-- Previous -->
+          <button
+            (click)="prevPage()"
+            [disabled]="currentPage() === 1"
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-border hover:border-primary text-text-secondary hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <i class="fa-solid fa-chevron-left text-sm"></i>
+          </button>
+
+          <!-- Page Numbers -->
+          @for (page of pageNumbers(); track $index) {
+            @if (page === '...') {
+              <span class="px-2 text-text-muted">…</span>
+            } @else {
+              <button
+                (click)="goToPage(page)"
+                [class]="page === currentPage() 
+                  ? 'bg-primary text-white border-primary' 
+                  : 'border-border hover:border-primary text-text-secondary hover:text-white'"
+                class="flex h-9 w-9 items-center justify-center rounded-lg border transition"
+              >
+                {{ page }}
+              </button>
+            }
+          }
+
+          <!-- Next -->
+          <button
+            (click)="nextPage()"
+            [disabled]="currentPage() === totalPagesComputed()"
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-border hover:border-primary text-text-secondary hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <i class="fa-solid fa-chevron-right text-sm"></i>
+          </button>
+
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  margin-top: auto;
+}
+
+/* Social icon hover */
+.border-border {
+  transition: all 0.3s ease;
+}
+
+.border-border:hover {
+  transform: translateY(-2px);
+}
+
+/* Link hover underline */
+a:not(.social-link) {
+  position: relative;
+}
+
+a:not(.social-link)::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+a:not(.social-link):hover::after {
+  width: 100%;
+}

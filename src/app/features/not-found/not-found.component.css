@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+.movie-icon{
+
+    animation:spinMovie 8s linear infinite;
+
+}
+
+@keyframes spinMovie{
+
+    from{
+
+        transform:rotate(0);
+
+    }
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}

@@ -1,0 +1,276 @@
+<div class="min-h-screen bg-background">
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-40">
+      <div class="flex flex-col items-center gap-3">
+        <i class="fa-solid fa-spinner fa-spin text-3xl text-primary"></i>
+        <p class="text-text-secondary">Loading TV show...</p>
+      </div>
+    </div>
+  }
+
+  <!-- TV Show Details -->
+  @if (tvShow(); as tvData) {
+    <!-- Hero Section with Backdrop -->
+    <div class="relative min-h-[70vh] flex items-end pb-16">
+      <!-- Backdrop -->
+      <div
+        class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        [style.backgroundImage]="'url(' + getBackdropUrl(tvData.backdrop_path) + ')'"
+      >
+        <div class="absolute inset-0 bg-linear-to-t from-background via-background/70 to-transparent"></div>
+        <div class="absolute inset-0 bg-linear-to-t from-background via-background/30 to-transparent"></div>
+      </div>
+
+      <!-- Content -->
+      <div class="relative z-10 container mx-auto px-4">
+        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+
+          <!-- Poster -->
+          <div class="shrink-0 w-48 md:w-64 lg:w-72 mx-auto lg:mx-0">
+            <img
+              [src]="getPosterUrl(tvData.poster_path)"
+              [alt]="tvData.name"
+              class="w-full rounded-2xl shadow-2xl"
+            />
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 text-white">
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold">
+              {{ tvData.name }}
+            </h1>
+
+            <!-- Tagline -->
+            @if (tvData.tagline) {
+              <p class="text-lg text-text-secondary italic mt-2">
+                "{{ tvData.tagline }}"
+              </p>
+            }
+
+            <!-- Meta -->
+            <div class="flex flex-wrap items-center gap-4 mt-4 text-sm">
+              @if (tvData.first_air_date) {
+                <span>{{ tvData.first_air_date | date:'yyyy' }}</span>
+              }
+              @if (tvData.status) {
+                <span
+                  class="px-3 py-1 rounded-full text-xs font-medium"
+                  [style.background]="getStatusColor(tvData.status) + '20'"
+                  [style.color]="getStatusColor(tvData.status)"
+                >
+                  {{ tvData.status }}
+                </span>
+              }
+              @if (tvData.number_of_seasons) {
+                <span>• {{ tvData.number_of_seasons }} Season{{ tvData.number_of_seasons > 1 ? 's' : '' }}</span>
+              }
+              @if (tvData.number_of_episodes) {
+                <span>• {{ tvData.number_of_episodes }} Episodes</span>
+              }
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center gap-4 mt-3">
+              <div class="flex items-center gap-2 text-yellow-400">
+                <i class="fa-solid fa-star"></i>
+                <span class="text-white font-semibold">{{ tvData.vote_average?.toFixed(1) }}</span>
+                <span class="text-text-secondary text-sm">({{ tvData.vote_count?.toLocaleString() }})</span>
+              </div>
+            </div>
+
+            <!-- Genres -->
+            <div class="flex flex-wrap gap-2 mt-4">
+              @for (genre of genreNames(); track $index) {
+                <span class="px-4 py-1.5 rounded-full bg-white/10 text-white text-sm border border-white/10">
+                  {{ genre }}
+                </span>
+              }
+            </div>
+
+            <!-- Overview -->
+            <p class="mt-6 text-text-secondary leading-relaxed max-w-2xl">
+              {{ tvData.overview }}
+            </p>
+
+            <!-- ✅ Buttons with Watchlist -->
+            <div class="flex flex-wrap gap-3 mt-6">
+              @if (trailerUrl()) {
+                <a
+                  [href]="trailerUrl()"
+                  target="_blank"
+                  class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover rounded-xl text-white font-semibold transition"
+                >
+                  <i class="fa-solid fa-play"></i>
+                  Play Trailer
+                </a>
+              }
+
+              <!-- ✅ Watchlist Button -->
+              <button
+                (click)="toggleWatchlist()"
+                [class]="isInWatchlist() 
+                  ? 'bg-primary/20 text-primary border border-primary hover:bg-primary/30' 
+                  : 'border border-border hover:border-primary text-text-secondary hover:text-white'"
+                class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition"
+              >
+                <i [class]="isInWatchlist() ? 'fa-solid fa-check' : 'fa-solid fa-plus'"></i>
+                {{ isInWatchlist() ? 'In Watchlist' : 'Add to Watchlist' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="container mx-auto px-4 py-8">
+      <div class="flex flex-wrap gap-6 border-b border-border pb-4">
+        <button
+          (click)="setTab('overview')"
+          [class]="activeTab() === 'overview' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+          class="pb-2 font-semibold transition"
+        >
+          Overview
+        </button>
+        <button
+          (click)="setTab('cast')"
+          [class]="activeTab() === 'cast' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+          class="pb-2 font-semibold transition"
+        >
+          Cast
+        </button>
+        <button
+          (click)="setTab('seasons')"
+          [class]="activeTab() === 'seasons' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+          class="pb-2 font-semibold transition"
+        >
+          Seasons
+        </button>
+        <button
+          (click)="setTab('similar')"
+          [class]="activeTab() === 'similar' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+          class="pb-2 font-semibold transition"
+        >
+          Similar
+        </button>
+      </div>
+
+      <!-- Overview Tab -->
+      @if (activeTab() === 'overview') {
+        <div class="py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-4">Details</h3>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between border-b border-border pb-2">
+                  <span class="text-text-secondary">Status</span>
+                  <span class="text-white">{{ tvData.status || '—' }}</span>
+                </div>
+                <div class="flex justify-between border-b border-border pb-2">
+                  <span class="text-text-secondary">First Air Date</span>
+                  <span class="text-white">{{ tvData.first_air_date || '—' }}</span>
+                </div>
+                @if (tvData.last_air_date) {
+                  <div class="flex justify-between border-b border-border pb-2">
+                    <span class="text-text-secondary">Last Air Date</span>
+                    <span class="text-white">{{ tvData.last_air_date }}</span>
+                  </div>
+                }
+                <div class="flex justify-between border-b border-border pb-2">
+                  <span class="text-text-secondary">Seasons</span>
+                  <span class="text-white">{{ tvData.number_of_seasons || '—' }}</span>
+                </div>
+                <div class="flex justify-between border-b border-border pb-2">
+                  <span class="text-text-secondary">Episodes</span>
+                  <span class="text-white">{{ tvData.number_of_episodes || '—' }}</span>
+                </div>
+                @if (tvData.homepage) {
+                  <div class="flex justify-between border-b border-border pb-2">
+                    <span class="text-text-secondary">Website</span>
+                    <a [href]="tvData.homepage" target="_blank" class="text-primary hover:underline">Visit Site</a>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-4">Created By</h3>
+              @if (creators()) {
+                <p class="text-white font-medium">{{ creators() }}</p>
+              } @else {
+                <p class="text-text-secondary">No creator information available</p>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Cast Tab -->
+      @if (activeTab() === 'cast') {
+        <div class="py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            @for (actor of mainCast(); track actor.id) {
+              <div class="text-center">
+                <img
+                  [src]="actor.profile_path ? 'https://image.tmdb.org/t/p/w185' + actor.profile_path : '/assets/images/no-avatar.jpg'"
+                  [alt]="actor.name"
+                  class="w-full rounded-xl aspect-2/3 object-cover bg-surface"
+                  loading="lazy"
+                />
+                <p class="text-sm font-medium text-white mt-2 line-clamp-1">{{ actor.name }}</p>
+                <p class="text-xs text-text-secondary line-clamp-1">{{ actor.character }}</p>
+              </div>
+            } @empty {
+              <p class="col-span-full text-text-secondary">No cast information available</p>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Seasons Tab -->
+      @if (activeTab() === 'seasons') {
+        <div class="py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            @for (season of seasons(); track season.id) {
+              <div class="bg-surface rounded-xl border border-border overflow-hidden transition hover:border-primary">
+                <img
+                  [src]="season.poster_path ? 'https://image.tmdb.org/t/p/w300' + season.poster_path : '/assets/images/no-poster.jpg'"
+                  [alt]="season.name"
+                  class="w-full aspect-2/3 object-cover"
+                  loading="lazy"
+                />
+                <div class="p-3 text-center">
+                  <p class="text-sm font-medium text-white">{{ season.name }}</p>
+                  <p class="text-xs text-text-secondary">{{ season.episode_count }} Episodes</p>
+                  @if (season.air_date) {
+                    <p class="text-xs text-text-muted">{{ season.air_date | date:'yyyy' }}</p>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="col-span-full text-text-secondary">No season information available</p>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Similar Tab -->
+      @if (activeTab() === 'similar') {
+        <div class="py-6">
+          @if (similarShows().length > 0) {
+            <div class="movie-grid">
+              @for (show of similarShows().slice(0, 8); track show.id) {
+                <app-movie-card [movie]="show" [type]="'tv'" />
+              }
+            </div>
+          } @else {
+            <p class="text-text-secondary text-center py-10">No similar shows found</p>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

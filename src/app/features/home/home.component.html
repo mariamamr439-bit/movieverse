@@ -1,0 +1,109 @@
+<div class="min-h-screen bg-background">
+  <!-- Hero Slider -->
+  <app-hero-slider />
+
+  <!-- Trending Movies -->
+  <section class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="section-title">
+        <i class="fa-solid fa-fire text-primary mr-2"></i>
+        Trending Movies
+      </h2>
+      <a routerLink="/movies">
+        <div class="text-sm text-primary hover:text-primary-hover transition">
+          <span>See All</span>
+          <i class="fa-solid fa-arrow-right ml-1"></i>
+        </div>
+      </a>
+    </div>
+    <div class="movie-grid">
+      @for (movie of trendingMovies().slice(0, 5); track movie.id) {
+        <app-movie-card [movie]="movie" [type]="'movie'" />
+      }
+    </div>
+  </section>
+
+  <!-- Trending TV Shows -->
+  <section class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="section-title">
+        <i class="fa-solid fa-tv text-primary mr-2"></i>
+        Trending TV Shows
+      </h2>
+      <a routerLink="/tv">
+        <div class="text-sm text-primary hover:text-primary-hover transition">
+          <span>See All</span>
+          <i class="fa-solid fa-arrow-right ml-1"></i>
+        </div>
+      </a>
+    </div>
+    <div class="movie-grid">
+      @for (show of trendingTvShows().slice(0, 5); track show.id) {
+        <app-movie-card [movie]="show" [type]="'tv'" />
+      }
+    </div>
+  </section>
+
+  <!-- Popular Movies -->
+  <section class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="section-title">
+        <i class="fa-solid fa-star text-primary mr-2"></i>
+        Popular Movies
+      </h2>
+      <a routerLink="/movies">
+        <div class="text-sm text-primary hover:text-primary-hover transition">
+          <span>See All</span>
+          <i class="fa-solid fa-arrow-right ml-1"></i>
+        </div>
+      </a>
+    </div>
+    <div class="movie-grid">
+      @for (movie of popularMovies().slice(0, 5); track movie.id) {
+        <app-movie-card [movie]="movie" [type]="'movie'" />
+      }
+    </div>
+  </section>
+
+  <!-- Popular TV Shows -->
+  <section class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="section-title">
+        <i class="fa-solid fa-fire text-primary mr-2"></i>
+        Popular TV Shows
+      </h2>
+      <a routerLink="/tv">
+        <div class="text-sm text-primary hover:text-primary-hover transition">
+          <span>See All</span>
+          <i class="fa-solid fa-arrow-right ml-1"></i>
+        </div>
+      </a>
+    </div>
+    <div class="movie-grid">
+      @for (show of popularTvShows().slice(0, 5); track show.id) {
+        <app-movie-card [movie]="show" [type]="'tv'" />
+      }
+    </div>
+  </section>
+
+  <!-- Top Rated Movies -->
+  <section class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="section-title">
+        <i class="fa-solid fa-trophy text-primary mr-2"></i>
+        Top Rated Movies
+      </h2>
+      <a routerLink="/movies">
+        <div class="text-sm text-primary hover:text-primary-hover transition">
+          <span>See All</span>
+          <i class="fa-solid fa-arrow-right ml-1"></i>
+        </div>
+      </a>
+    </div>
+    <div class="movie-grid">
+      @for (movie of topRatedMovies().slice(0, 5); track movie.id) {
+        <app-movie-card [movie]="movie" [type]="'movie'" />
+      }
+    </div>
+  </section>
+</div>

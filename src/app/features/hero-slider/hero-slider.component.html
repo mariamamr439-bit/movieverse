@@ -1,0 +1,67 @@
+<section class="relative w-full overflow-hidden">
+  <swiper-container
+    class="mySwiper w-full"
+    loop="true"
+    navigation="true"
+    pagination='{"clickable": true}'
+    autoplay='{"delay": 5000, "disableOnInteraction": false}'
+    style="height: 80vh; min-height: 500px; max-height: 800px;"
+  >
+    @for (movie of trendingMovies(); track movie.id) {
+      <swiper-slide>
+        <div class="w-full h-full flex items-center relative overflow-hidden">
+          <!-- Background Image -->
+          <div 
+            class="absolute inset-0"
+            style="background-size: cover; background-position: center 20%;"
+            [style.backgroundImage]="'url(' + getBackdropUrl(movie.backdrop_path) + ')'"
+          ></div>
+          
+          <!-- Zoom effect -->
+          <div 
+            class="absolute inset-0 transition-transform duration-10000 group-hover:scale-110"
+            style="background-size: cover; background-position: center 20%;"
+            [style.backgroundImage]="'url(' + getBackdropUrl(movie.backdrop_path) + ')'"
+          ></div>
+          
+          <!-- Dark Overlay -->
+          <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/70 to-transparent lg:bg-gradient-to-r lg:from-black/90 lg:via-black/60 lg:to-transparent"></div>
+          
+          <!-- Content - Centered vertically -->
+          <div class="relative z-10 w-full px-4 sm:px-6 md:px-10 lg:px-15 text-white space-y-3 sm:space-y-4 md:space-y-5 py-8 sm:py-12 mt-10 sm:mt-16">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold max-w-3xl leading-tight">
+              {{ getTitle(movie) }}
+            </h2>
+            
+            <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm md:text-base">
+              @if (getYear(movie.release_date)) {
+                <span class="text-text-secondary">{{ getYear(movie.release_date) }}</span>
+              }
+              @if (getRating(movie.vote_average)) {
+                <span class="flex items-center gap-1 text-yellow-400">
+                  <i class="fa-solid fa-star text-[10px] sm:text-xs md:text-sm"></i>
+                  {{ getRating(movie.vote_average) }}
+                </span>
+              }
+            </div>
+
+            <p class="text-text-secondary text-sm sm:text-base md:text-lg max-w-xl line-clamp-2 sm:line-clamp-3 md:line-clamp-4">
+              {{ getOverview(movie) }}
+            </p>
+
+            <div class="flex flex-wrap gap-3 sm:gap-4 mt-3 sm:mt-4 md:mt-6">
+              <a
+                [routerLink]="getLink(movie)"
+                class="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-3.5 bg-primary hover:bg-primary-hover rounded-lg sm:rounded-xl text-white font-semibold text-sm sm:text-base md:text-lg transition hover:scale-105 shadow-lg shadow-primary/30"
+              >
+                <i class="fa-solid fa-play text-xs sm:text-sm"></i>
+                <span class="hidden xs:inline">More Info</span>
+                <span class="xs:hidden">Info</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </swiper-slide>
+    }
+  </swiper-container>
+</section>

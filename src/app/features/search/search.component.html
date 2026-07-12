@@ -1,0 +1,186 @@
+<div class="min-h-screen bg-background py-8">
+  <div class="container mx-auto px-4">
+
+    <!-- Search Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-extrabold text-white">Search</h1>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="flex items-center gap-4 mb-8">
+      <div class="flex-1 relative">
+        <input
+          [(ngModel)]="searchQuery"
+          (keydown)="onKeydown($event)"
+          placeholder="Search movies, TV shows, people..."
+          class="w-full px-6 py-4 pl-12 bg-surface rounded-xl border border-border focus:border-primary outline-none text-white transition placeholder:text-text-muted"
+        />
+        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"></i>
+        @if (searchQuery()) {
+          <button
+            (click)="clearSearch()"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition"
+          >
+            <i class="fa-solid fa-times"></i>
+          </button>
+        }
+      </div>
+      <button
+        (click)="onSearch()"
+        class="px-8 py-4 bg-primary hover:bg-primary-hover rounded-xl text-white font-semibold transition"
+      >
+        Search
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="flex items-center justify-center py-20">
+        <div class="flex flex-col items-center gap-3">
+          <i class="fa-solid fa-spinner fa-spin text-3xl text-primary"></i>
+          <p class="text-text-secondary">Searching...</p>
+        </div>
+      </div>
+    }
+
+    <!-- Results -->
+    @if (!isLoading() && searchResults().length > 0) {
+      <div>
+
+        <!-- Filter Tabs -->
+        <div class="flex flex-wrap gap-3 mb-6 border-b border-border pb-4">
+          <button
+            (click)="setFilter('all')"
+            [class]="filterType() === 'all' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+            class="pb-2 font-semibold transition"
+          >
+            All ({{ searchResults().length }})
+          </button>
+          <button
+            (click)="setFilter('movie')"
+            [class]="filterType() === 'movie' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+            class="pb-2 font-semibold transition"
+          >
+            Movies ({{ movieResults().length }})
+          </button>
+          <button
+            (click)="setFilter('tv')"
+            [class]="filterType() === 'tv' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+            class="pb-2 font-semibold transition"
+          >
+            TV Shows ({{ tvResults().length }})
+          </button>
+          <button
+            (click)="setFilter('person')"
+            [class]="filterType() === 'person' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
+            class="pb-2 font-semibold transition"
+          >
+            People ({{ personResults().length }})
+          </button>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+
+          @for (result of filteredResults(); track result.id) {
+            <a
+              [routerLink]="getLink(result)"
+              class="group bg-surface rounded-xl border border-border overflow-hidden transition hover:-translate-y-1 hover:border-primary"
+            >
+
+              @if (result.media_type === 'person') {
+                <!-- Person -->
+                <div class="relative aspect-2/3 bg-surface">
+                  @if (result.profile_path) {
+                    <img
+                      [src]="getProfileUrl(result.profile_path)"
+                      [alt]="getTitle(result)"
+                      class="w-full h-full object-cover transition group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  } @else {
+                    <!-- Fallback for person without image -->
+                    <div class="w-full h-full flex items-center justify-center bg-linear-to-br from-surface-light to-surface">
+                      <div class="text-center">
+                        <i class="fa-solid fa-user text-5xl text-text-muted mb-2"></i>
+                        <p class="text-xs text-text-muted">No Image</p>
+                      </div>
+                    </div>
+                  }
+                  <div class="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-white">
+                    <i [class]="getMediaIcon(result)"></i>
+                    {{ getMediaType(result) }}
+                  </div>
+                </div>
+                <div class="p-3">
+                  <p class="text-sm font-medium text-white line-clamp-1">{{ getTitle(result) }}</p>
+                  @if (result.known_for && result.known_for.length > 0) {
+                    <p class="text-xs text-text-secondary line-clamp-1">
+                      {{ getKnownFor(result) }}
+                    </p>
+                  }
+                </div>
+              } @else {
+                <!-- Movie / TV Show -->
+                <div class="relative aspect-2/3 bg-surface">
+                  @if (result.poster_path) {
+                    <img
+                      [src]="getPosterUrl(result.poster_path)"
+                      [alt]="getTitle(result)"
+                      class="w-full h-full object-cover transition group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  } @else {
+                    <!-- Fallback for movie/tv without poster -->
+                    <div class="w-full h-full flex items-center justify-center bg-linear-to-br from-surface-light to-surface">
+                      <div class="text-center">
+                        <i class="fa-solid fa-film text-5xl text-text-muted mb-2"></i>
+                        <p class="text-xs text-text-muted">No Poster</p>
+                      </div>
+                    </div>
+                  }
+                  <div class="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-white">
+                    <i [class]="getMediaIcon(result)"></i>
+                    {{ getMediaType(result) }}
+                  </div>
+                  @if (getRating(result.vote_average || 0) !== '0.0') {
+                    <div class="absolute top-2 right-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-yellow-400 flex items-center gap-1">
+                      <i class="fa-solid fa-star"></i>
+                      {{ getRating(result.vote_average || 0) }}
+                    </div>
+                  }
+                </div>
+                <div class="p-3">
+                  <p class="text-sm font-medium text-white line-clamp-1">{{ getTitle(result) }}</p>
+                  <p class="text-xs text-text-secondary">{{ getYear(result) }}</p>
+                </div>
+              }
+
+            </a>
+          }
+
+        </div>
+
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading() && searchResults().length === 0 && query()) {
+      <div class="flex flex-col items-center justify-center py-20">
+        <i class="fa-solid fa-search text-6xl text-text-muted mb-4"></i>
+        <h2 class="text-2xl font-bold text-white">No results found</h2>
+        <p class="text-text-secondary mt-2">Try searching for something else</p>
+      </div>
+    }
+
+    <!-- Initial State -->
+    @if (!isLoading() && searchResults().length === 0 && !query()) {
+      <div class="flex flex-col items-center justify-center py-20">
+        <i class="fa-solid fa-search text-6xl text-text-muted mb-4"></i>
+        <h2 class="text-2xl font-bold text-white">Search for movies, TV shows, or people</h2>
+        <p class="text-text-secondary mt-2">Start typing to search...</p>
+      </div>
+    }
+
+  </div>
+</div>
