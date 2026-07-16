@@ -1,56 +1,90 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
-    catchError((error) => {
-      let errorMessage = 'Something went wrong';
+    catchError((err: HttpErrorResponse) => {
+      let errorMessage = 'Something went wrong. Please try again.';
+      let errorTitle = 'Error';
 
-      if (error.error instanceof ErrorEvent) {
-        // Client-side error
-        errorMessage = error.error.message;
+      // Client-side error (network issues)
+      if (err.error instanceof ErrorEvent) {
+        errorMessage = 'Network error. Please check your internet connection.';
+        errorTitle = 'Connection Error';
       } else {
-        // Server-side error
-        switch (error.status) {
+        // Server-side errors
+        switch (err.status) {
+          case 0:
+            errorMessage = 'Unable to connect to the server. Please check your internet connection.';
+            errorTitle = 'Connection Error';
+            break;
           case 400:
-            errorMessage = 'Bad request. Please check your input.';
+            errorMessage = err.error?.status_message || 'Bad request. Please check your input.';
+            errorTitle = 'Bad Request';
             break;
           case 401:
-            errorMessage = 'Unauthorized. Please check your API key.';
+            errorMessage = err.error?.status_message || 'Invalid API key. Please check your credentials.';
+            errorTitle = 'Authentication Error';
             break;
           case 403:
-            errorMessage = 'Forbidden. You do not have permission.';
+            errorMessage = err.error?.status_message || 'You do not have permission to access this resource.';
+            errorTitle = 'Access Denied';
             break;
           case 404:
-            errorMessage = 'Resource not found.';
+            errorMessage = err.error?.status_message || 'The requested resource was not found.';
+            errorTitle = 'Not Found';
             break;
           case 429:
-            errorMessage = 'Too many requests. Please try again later.';
+            errorMessage = err.error?.status_message || 'Too many requests. Please wait a moment and try again.';
+            errorTitle = 'Rate Limit Exceeded';
             break;
           case 500:
-            errorMessage = 'Internal server error. Please try again later.';
+            errorMessage = err.error?.status_message || 'Internal server error. Please try again later.';
+            errorTitle = 'Server Error';
+            break;
+          case 502:
+          case 503:
+          case 504:
+            errorMessage = 'The server is currently unavailable. Please try again later.';
+            errorTitle = 'Service Unavailable';
             break;
           default:
-            errorMessage = error.message || 'An unexpected error occurred.';
+            errorMessage = err.error?.status_message || err.message || 'An unexpected error occurred.';
+            errorTitle = `Error ${err.status || ''}`;
+            break;
         }
       }
+
+      // Log error for debugging
+      console.error('API Error:', err);
 
       // Show error toast
       Swal.fire({
         icon: 'error',
-        title: 'Error',
+        title: errorTitle,
         text: errorMessage,
         timer: 4000,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-        background: '#0f172a',
-        color: '#f8fafc',
+        showConfirmButton: true,
+        confirmButtonColor: '#E50914',
+        confirmButtonText: 'Got it',
+        background: '#1A1A2E',
+        color: '#FFFFFF',
+        backdrop: 'rgba(0,0,0,0.6)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInUp animate__faster',
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutDown animate__faster',
+        },
+        customClass: {
+          confirmButton: 'bg-primary hover:bg-primary-hover rounded-xl px-6 py-2.5 text-white font-semibold transition',
+          popup: 'rounded-2xl border border-border',
+          title: 'text-2xl font-bold',
+        },
       });
 
-      console.error('API Error:', error);
-      return throwError(() => error);
+      return throwError(() => err);
     })
   );
 };

@@ -1,36 +1,84 @@
 <div class="min-h-screen bg-background py-8">
-  <div class="container mx-auto px-4">
+  <div class="container mx-auto px-4 max-w-4xl">
 
     <!-- Search Header -->
-    <div class="mb-8">
+    <div class="mb-8 text-center">
       <h1 class="text-4xl font-extrabold text-white">Search</h1>
+      <p class="text-text-secondary mt-1">Find movies, TV shows, and people</p>
     </div>
 
     <!-- Search Bar -->
-    <div class="flex items-center gap-4 mb-8">
-      <div class="flex-1 relative">
-        <input
-          [(ngModel)]="searchQuery"
-          (keydown)="onKeydown($event)"
-          placeholder="Search movies, TV shows, people..."
-          class="w-full px-6 py-4 pl-12 bg-surface rounded-xl border border-border focus:border-primary outline-none text-white transition placeholder:text-text-muted"
-        />
-        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"></i>
-        @if (searchQuery()) {
-          <button
-            (click)="clearSearch()"
-            class="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition"
-          >
-            <i class="fa-solid fa-times"></i>
-          </button>
-        }
+    <div class="relative">
+      <div class="flex items-center gap-4">
+        <div class="flex-1 relative">
+          <div class="relative">
+            <input
+              #searchInput
+              [(ngModel)]="searchQuery"
+              (input)="onSearchInput()"
+              (keydown)="onKeydown($event)"
+              (focus)="onInputFocus()"
+              (blur)="onInputBlur()"
+              placeholder="Search for movies, TV shows, people..."
+              class="w-full px-6 py-4 pl-14 bg-surface rounded-2xl border-2 border-border focus:border-primary outline-none text-white text-lg transition placeholder:text-text-muted shadow-lg shadow-black/20"
+            />
+            <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-text-muted text-lg"></i>
+            
+            @if (searchQuery()) {
+              <button
+                (click)="clearSearch()"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-light"
+              >
+                <i class="fa-solid fa-times"></i>
+              </button>
+            }
+          </div>
+
+          <!-- Autocomplete Suggestions -->
+          @if (isInputFocused() && searchQuery() && searchResults().length > 0 && !isLoading()) {
+            <div class="absolute top-full left-0 right-0 mt-2 bg-surface rounded-2xl border border-border shadow-2xl overflow-hidden z-50">
+              @for (result of suggestionsList(); track result.id) {
+                <button
+                  (click)="selectSuggestion(result)"
+                  class="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-light transition text-left border-b border-border/50 last:border-0"
+                >
+                  <!-- Small poster or icon -->
+                  @if (result.poster_path || result.profile_path) {
+                    <img
+                      [src]="result.poster_path ? getPosterUrl(result.poster_path) : getProfileUrl(result.profile_path)"
+                      [alt]="getTitle(result)"
+                      class="w-10 h-14 rounded-lg object-cover shrink-0"
+                    />
+                  } @else {
+                    <div class="w-10 h-14 rounded-lg bg-surface-light flex items-center justify-center shrink-0">
+                      <i [class]="getMediaIcon(result)" class="text-text-muted text-xl"></i>
+                    </div>
+                  }
+                  
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate">{{ getTitle(result) }}</p>
+                    <div class="flex items-center gap-2 text-xs text-text-secondary">
+                      <span>{{ getMediaType(result) }}</span>
+                      @if (getYear(result)) {
+                        <span>• {{ getYear(result) }}</span>
+                      }
+                    </div>
+                  </div>
+                  
+                  <i class="fa-solid fa-arrow-right text-text-muted text-sm"></i>
+                </button>
+              }
+            </div>
+          }
+        </div>
+        
+        <button
+          (click)="onSearch()"
+          class="px-8 py-4 bg-primary hover:bg-primary-hover rounded-2xl text-white font-semibold text-lg transition hover:scale-105 shadow-lg shadow-primary/30 shrink-0"
+        >
+          Search
+        </button>
       </div>
-      <button
-        (click)="onSearch()"
-        class="px-8 py-4 bg-primary hover:bg-primary-hover rounded-xl text-white font-semibold transition"
-      >
-        Search
-      </button>
     </div>
 
     <!-- Loading -->
@@ -45,52 +93,59 @@
 
     <!-- Results -->
     @if (!isLoading() && searchResults().length > 0) {
-      <div>
+      <div class="mt-8">
+
+        <!-- Results Header -->
+        <div class="flex items-center justify-between mb-6">
+          <p class="text-text-secondary">
+            <span class="text-white font-semibold">{{ searchResults().length }}</span> results found
+          </p>
+        </div>
 
         <!-- Filter Tabs -->
-        <div class="flex flex-wrap gap-3 mb-6 border-b border-border pb-4">
+        <div class="flex flex-wrap gap-2 mb-6 border-b border-border pb-4">
           <button
             (click)="setFilter('all')"
-            [class]="filterType() === 'all' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
-            class="pb-2 font-semibold transition"
+            [class]="filterType() === 'all' ? 'bg-primary text-white border-primary' : 'bg-surface text-text-secondary border-border hover:border-primary hover:text-white'"
+            class="px-4 py-2 rounded-xl border transition font-medium text-sm"
           >
             All ({{ searchResults().length }})
           </button>
           <button
             (click)="setFilter('movie')"
-            [class]="filterType() === 'movie' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
-            class="pb-2 font-semibold transition"
+            [class]="filterType() === 'movie' ? 'bg-primary text-white border-primary' : 'bg-surface text-text-secondary border-border hover:border-primary hover:text-white'"
+            class="px-4 py-2 rounded-xl border transition font-medium text-sm"
           >
             Movies ({{ movieResults().length }})
           </button>
           <button
             (click)="setFilter('tv')"
-            [class]="filterType() === 'tv' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
-            class="pb-2 font-semibold transition"
+            [class]="filterType() === 'tv' ? 'bg-primary text-white border-primary' : 'bg-surface text-text-secondary border-border hover:border-primary hover:text-white'"
+            class="px-4 py-2 rounded-xl border transition font-medium text-sm"
           >
             TV Shows ({{ tvResults().length }})
           </button>
           <button
             (click)="setFilter('person')"
-            [class]="filterType() === 'person' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary hover:text-white'"
-            class="pb-2 font-semibold transition"
+            [class]="filterType() === 'person' ? 'bg-primary text-white border-primary' : 'bg-surface text-text-secondary border-border hover:border-primary hover:text-white'"
+            class="px-4 py-2 rounded-xl border transition font-medium text-sm"
           >
             People ({{ personResults().length }})
           </button>
         </div>
 
         <!-- Results Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
 
           @for (result of filteredResults(); track result.id) {
             <a
               [routerLink]="getLink(result)"
-              class="group bg-surface rounded-xl border border-border overflow-hidden transition hover:-translate-y-1 hover:border-primary"
+              class="group bg-surface rounded-xl border border-border overflow-hidden transition hover:-translate-y-1 hover:border-primary hover:shadow-xl"
             >
 
               @if (result.media_type === 'person') {
                 <!-- Person -->
-                <div class="relative aspect-2/3 bg-surface">
+                <div class="relative aspect-[2/3] bg-surface">
                   @if (result.profile_path) {
                     <img
                       [src]="getProfileUrl(result.profile_path)"
@@ -99,8 +154,7 @@
                       loading="lazy"
                     />
                   } @else {
-                    <!-- Fallback for person without image -->
-                    <div class="w-full h-full flex items-center justify-center bg-linear-to-br from-surface-light to-surface">
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-light to-surface">
                       <div class="text-center">
                         <i class="fa-solid fa-user text-5xl text-text-muted mb-2"></i>
                         <p class="text-xs text-text-muted">No Image</p>
@@ -122,7 +176,7 @@
                 </div>
               } @else {
                 <!-- Movie / TV Show -->
-                <div class="relative aspect-2/3 bg-surface">
+                <div class="relative aspect-[2/3] bg-surface">
                   @if (result.poster_path) {
                     <img
                       [src]="getPosterUrl(result.poster_path)"
@@ -131,8 +185,7 @@
                       loading="lazy"
                     />
                   } @else {
-                    <!-- Fallback for movie/tv without poster -->
-                    <div class="w-full h-full flex items-center justify-center bg-linear-to-br from-surface-light to-surface">
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-light to-surface">
                       <div class="text-center">
                         <i class="fa-solid fa-film text-5xl text-text-muted mb-2"></i>
                         <p class="text-xs text-text-muted">No Poster</p>
@@ -170,6 +223,12 @@
         <i class="fa-solid fa-search text-6xl text-text-muted mb-4"></i>
         <h2 class="text-2xl font-bold text-white">No results found</h2>
         <p class="text-text-secondary mt-2">Try searching for something else</p>
+        <button
+          (click)="clearSearch()"
+          class="mt-6 text-primary hover:underline transition"
+        >
+          Clear search
+        </button>
       </div>
     }
 

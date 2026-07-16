@@ -4,6 +4,26 @@
 
 .line-clamp-1 {
   display: -webkit-box;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Input focus glow */
+input:focus {
+  box-shadow: 0 0 0 4px rgba(229, 9, 20, 0.15);
+}
+
+/* Autocomplete scroll */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
 }

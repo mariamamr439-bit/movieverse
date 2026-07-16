@@ -2,8 +2,7 @@
   display: block;
 }
 
-/* Active Link */
-
+/* ===== Active Link ===== */
 .router-link-active {
   position: relative;
   color: var(--color-primary);
@@ -11,28 +10,21 @@
 
 .router-link-active::after {
   content: "";
-
   position: absolute;
-
   left: 0;
   right: 0;
   bottom: -8px;
-
   height: 2px;
-
   border-radius: 999px;
-
   background: currentColor;
 }
 
-/* Smooth Mobile Menu */
-
+/* ===== Smooth Mobile Menu ===== */
 @keyframes mobileMenu {
   from {
     opacity: 0;
     transform: translateY(-12px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -42,4 +34,122 @@
 .md\:hidden > div,
 .md\:hidden nav {
   animation: mobileMenu 0.25s ease;
+}
+
+/* ===== Fix White Flash on Input Focus ===== */
+
+/* Remove default browser autofill background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1A1A2E inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  caret-color: #FFFFFF !important;
+  background-color: #1A1A2E !important;
+}
+
+/* Input background always dark */
+input {
+  background-color: #1A1A2E !important;
+  color: #FFFFFF !important;
+}
+
+/* Remove white background on focus */
+input:focus {
+  background-color: #1A1A2E !important;
+  outline: none !important;
+}
+
+/* Fix for input on focus */
+input:-webkit-autofill {
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Placeholder color */
+input::placeholder {
+  color: #6B6B6B !important;
+}
+
+/* Remove default browser outline */
+*:focus {
+  outline: none;
+}
+
+/* ===== Fix White Flash on Suggestions Container ===== */
+
+/* Force dark background on suggestions container */
+.bg-surface {
+  background-color: #1A1A2E !important;
+}
+
+.bg-surface-light {
+  background-color: #2D2D44 !important;
+}
+
+/* Suggestions container - ensure dark background */
+.absolute.top-full {
+  background-color: #1A1A2E !important;
+}
+
+/* Ensure all suggestion items are dark */
+.w-full.flex.items-center {
+  background-color: transparent !important;
+}
+
+.w-full.flex.items-center:hover {
+  background-color: #2D2D44 !important;
+}
+
+/* ===== Badge Pulse Animation ===== */
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.nav-link .absolute {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* ===== Nav Link Hover ===== */
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: white;
+}
+
+/* ===== Mobile Menu Items ===== */
+.md\:hidden a {
+  transition: background 0.2s ease;
+}
+
+.md\:hidden a:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ===== Container Height Fix ===== */
+.h-18 {
+  height: 4.5rem;
+}
+
+/* ===== Search Input Focus Glow ===== */
+input:focus {
+  box-shadow: 0 0 0 3px rgba(160, 14, 19, 0.2) !important;
+}
+
+/* ===== Remove White Background on Autofill ===== */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px #1A1A2E inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+input:-webkit-autofill::first-line {
+  color: #FFFFFF !important;
 }
